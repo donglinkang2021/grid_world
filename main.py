@@ -35,7 +35,8 @@ def PE_demo(env:GridWorld):
     state_values=np.random.uniform(0,10,(env.num_states,))
     state_values = policy_evaluation(env, policy_matrix, state_values)
     env.show_policy_and_values(state_values=state_values)
-    env.show_values_3d(state_values)
+    from utils import draw_matrix2d_smooth
+    draw_matrix2d_smooth(state_values.reshape(env.env_size), title="3D State Values")
     plt.show()
 
 # Example usage:

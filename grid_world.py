@@ -211,28 +211,3 @@ class GridWorld:
                     color='black'
                 )
 
-        # plt.show()
-
-    def show_values_3d(self, state_values):
-        fig = plt.figure('State Values 3D', figsize=(10, 7))
-        ax = fig.add_subplot(111, projection='3d')
-        x = np.arange(self.env_size[0])
-        y = np.arange(self.env_size[1])
-        X, Y = np.meshgrid(x, y)
-        Z = state_values.reshape(self.env_size)
-        
-        # Using viridis colormap which transitions from blue to yellow
-        surf = ax.plot_surface(Y, X, Z, cmap='viridis', edgecolor='none')
-        
-        # 调整视角和比例
-        ax.view_init(elev=30, azim=-45)
-        ax.set_box_aspect([2.5, 2.5, 1])
-        
-        # 设置坐标轴标签
-        ax.set_xlabel('Column')
-        ax.set_ylabel('Row')
-        ax.set_zlabel('Value')
-        
-        plt.title('Interpolated 3D State Values')
-        plt.tight_layout()
-        plt.show()
