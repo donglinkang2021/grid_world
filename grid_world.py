@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from utils import *
 
+from utils import *
 
 class GridWorld:
     def __init__(
@@ -19,6 +19,7 @@ class GridWorld:
         ):
         self.env_size = env_size
         self.num_states = env_size[0] * env_size[1]
+        self.num_actions = len(action_space)
         self.start_state = start_state
         self.target_state = target_state
         self.forbidden_states = forbidden_states
@@ -75,7 +76,10 @@ class GridWorld:
         #     reward = self.reward_target
         # elif new_state in self.forbidden_states:  # stay
         #     x, y = state
-        #     reward = self.reward_forbidden        
+        #     reward = self.reward_forbidden    
+        # else:
+        #     x, y = new_state
+        #     reward = self.reward_step    
         else: # do not stay
             x, y = new_state
             if new_state == self.target_state:
@@ -86,6 +90,23 @@ class GridWorld:
                 reward = self.reward_step
             
         return (x, y), reward
+    
+    def get_model(self):
+        P = {}
+        for state_idx in range(self.num_states):
+            state = (
+                state_idx % self.env_size[0],
+                state_idx // self.env_size[0]
+            )
+            P[state_idx] = {}
+            for action_idx, action in enumerate(self.action_space):
+                next_state, reward = self._get_next_state_and_reward(state, action)
+                next_state_idx = next_state[0] * self.env_size[0] + next_state[1]
+                P[state_idx][action_idx] = {
+                    "next_state": next_state_idx,
+                    "reward": reward
+                }
+        return P
         
 
     def _is_done(self, state):
@@ -193,7 +214,7 @@ class GridWorld:
         # plt.show()
 
     def show_values_3d(self, state_values):
-        fig = plt.figure('State Values 3D')
+        fig = plt.figure('State Values 3D', figsize=(10, 7))
         ax = fig.add_subplot(111, projection='3d')
         x = np.arange(self.env_size[0])
         y = np.arange(self.env_size[1])
@@ -203,12 +224,15 @@ class GridWorld:
         # Using viridis colormap which transitions from blue to yellow
         surf = ax.plot_surface(Y, X, Z, cmap='viridis', edgecolor='none')
         
-        # Add a color bar to show the value range
-        fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
+        # 调整视角和比例
+        ax.view_init(elev=30, azim=-45)
+        ax.set_box_aspect([2.5, 2.5, 1])
         
-        ax.set_xlabel('row')
-        ax.set_ylabel('column')
+        # 设置坐标轴标签
+        ax.set_xlabel('Column')
+        ax.set_ylabel('Row')
         ax.set_zlabel('Value')
-
-        plt.title('3D State Values')
+        
+        plt.title('Interpolated 3D State Values')
+        plt.tight_layout()
         plt.show()
