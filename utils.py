@@ -35,7 +35,7 @@ def draw_matrix2d(matrix2d:np.ndarray, title:str):
     surf = ax.plot_surface(Y, X, Z, cmap='viridis', edgecolor='none')
     
     # Set aspect ratio
-    ax.view_init(elev=45, azim=315)
+    ax.view_init(elev=30, azim=345)
     ax.set_box_aspect([2.5, 2.5, 1])
     
     # Set axis labels
@@ -75,7 +75,7 @@ def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
     surf = ax.plot_surface(Y_new, X_new, Z_new, cmap='viridis', edgecolor='none')
 
     # Set aspect ratio
-    ax.view_init(elev=45, azim=345)
+    ax.view_init(elev=30, azim=345)
     ax.set_box_aspect([2.5, 2.5, 1])
 
     # Set axis labels

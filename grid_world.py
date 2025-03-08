@@ -175,7 +175,7 @@ class GridWorld:
                 y = state // self.env_size[0]
                 for i, action_probability in enumerate(state_action_group):
                     dx, dy = self.action_space[i]
-                    if (dx, dy) != (0,0):
+                    if (dx, dy) != (0,0): # other Action except stay
                         ax.add_patch(
                             patches.FancyArrow(
                                 x, y, 
@@ -185,7 +185,7 @@ class GridWorld:
                                 width=0.001, head_width=0.05
                             )
                         )
-                    else:
+                    else: # Action (0,0) is a stay(loop) action
                         ax.add_patch(
                             patches.Circle(
                                 (x, y), 
