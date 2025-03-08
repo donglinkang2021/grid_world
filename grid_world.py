@@ -17,8 +17,9 @@ class GridWorld:
             reward_step, 
             animation_interval
         ):
+        n_rows, m_cols = env_size
         self.env_size = env_size
-        self.num_states = env_size[0] * env_size[1]
+        self.num_states = n_rows * m_cols
         self.num_actions = len(action_space)
         self.start_state = start_state
         self.target_state = target_state
@@ -29,6 +30,11 @@ class GridWorld:
         self.reward_forbidden = reward_forbidden
         self.reward_step = reward_step
         self.animation_interval = animation_interval
+
+        self.state_space = [
+            (state_idx % n_rows, state_idx // n_rows)
+                for state_idx in range(self.num_states)
+        ]
 
         self.canvas = None
 
@@ -94,14 +100,11 @@ class GridWorld:
     def get_model(self):
         P = {}
         for state_idx in range(self.num_states):
-            state = (
-                state_idx % self.env_size[0],
-                state_idx // self.env_size[0]
-            )
+            state = self.state_space[state_idx]
             P[state_idx] = {}
             for action_idx, action in enumerate(self.action_space):
                 next_state, reward = self._get_next_state_and_reward(state, action)
-                next_state_idx = next_state[0] * self.env_size[0] + next_state[1]
+                next_state_idx = self.state_space.index(next_state)
                 P[state_idx][action_idx] = {
                     "next_state": next_state_idx,
                     "reward": reward

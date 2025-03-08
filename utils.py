@@ -35,7 +35,7 @@ def draw_matrix2d(matrix2d:np.ndarray, title:str):
     surf = ax.plot_surface(Y, X, Z, cmap='viridis', edgecolor='none')
     
     # Set aspect ratio
-    ax.view_init(elev=30, azim=345)
+    ax.view_init(elev=30, azim=330)
     ax.set_box_aspect([2.5, 2.5, 1])
     
     # Set axis labels
@@ -45,7 +45,7 @@ def draw_matrix2d(matrix2d:np.ndarray, title:str):
     ax.set_title(title, fontsize=14)
 
     # Add color bar
-    fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
+    # fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
     plt.tight_layout()
 
 def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
@@ -70,12 +70,25 @@ def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
     X_new, Y_new = np.meshgrid(x_new, y_new)
 
     # Draw 3D surface plot
-    fig = plt.figure(figsize=(10, 7))
+    fig = plt.figure(title, figsize=(10, 7))
     ax = fig.add_subplot(111, projection='3d')
-    surf = ax.plot_surface(Y_new, X_new, Z_new, cmap='viridis', edgecolor='none')
+    surf = ax.plot_surface(
+        Y_new, X_new, Z_new,
+        cmap='viridis',
+        alpha=0.8,
+        edgecolor='none'
+    )
+
+    for x_row in x_orig:
+        ax.plot([x_row]*n, x_orig, matrix2d[x_row, :],
+                color='black', linestyle='-', linewidth=1)
+
+    for y_col in y_orig:
+        ax.plot(y_orig, [y_col]*m, matrix2d[:, y_col],
+                color='black', linestyle='-', linewidth=1)
 
     # Set aspect ratio
-    ax.view_init(elev=30, azim=345)
+    ax.view_init(elev=30, azim=330)
     ax.set_box_aspect([2.5, 2.5, 1])
 
     # Set axis labels
@@ -85,7 +98,7 @@ def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
     ax.set_title(title, fontsize=14)
 
     # Add color bar
-    fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
+    # fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
     plt.tight_layout()
 
 if __name__ == '__main__':
