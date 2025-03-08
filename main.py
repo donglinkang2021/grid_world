@@ -16,15 +16,19 @@ def random_policy_demo(env:GridWorld, num_steps=1000):
 def show_policy_and_values_demo(env:GridWorld):
     policy_matrix = np.random.rand(env.num_states, len(env.action_space))
     policy_matrix /= policy_matrix.sum(axis=1)[:, np.newaxis]
+    state_values=np.random.uniform(0,10,(env.num_states,))
     
     env.show_policy_and_values(
         policy_matrix=policy_matrix,
-        # state_values=np.random.uniform(0,10,(env.num_states,))
+        state_values=state_values
+    )
+    env.show_values_3d(
+        state_values=state_values
     )
 
 # Example usage:
 if __name__ == "__main__":
     from arguments import args        
     env = GridWorld(**vars(args))
-    random_policy_demo(env, num_steps=100)
-    # show_policy_and_values_demo(env)
+    # random_policy_demo(env, num_steps=100)
+    show_policy_and_values_demo(env)

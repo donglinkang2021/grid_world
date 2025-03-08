@@ -190,4 +190,25 @@ class GridWorld:
                     color='black'
                 )
 
+        # plt.show()
+
+    def show_values_3d(self, state_values):
+        fig = plt.figure('State Values 3D')
+        ax = fig.add_subplot(111, projection='3d')
+        x = np.arange(self.env_size[0])
+        y = np.arange(self.env_size[1])
+        X, Y = np.meshgrid(x, y)
+        Z = state_values.reshape(self.env_size)
+        
+        # Using viridis colormap which transitions from blue to yellow
+        surf = ax.plot_surface(Y, X, Z, cmap='viridis', edgecolor='none')
+        
+        # Add a color bar to show the value range
+        fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
+        
+        ax.set_xlabel('row')
+        ax.set_ylabel('column')
+        ax.set_zlabel('Value')
+
+        plt.title('3D State Values')
         plt.show()
