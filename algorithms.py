@@ -1,5 +1,6 @@
 import numpy as np
 from grid_world import GridWorld
+from tqdm import tqdm
 
 # model-based method
 def policy_evaluation(env:GridWorld, policy_matrix:np.ndarray, state_values:np.ndarray, gamma=0.9, theta=1e-5):
@@ -30,7 +31,12 @@ def TD_table(
     P = env.get_model()
     weights = np.random.randn(env.num_states, 1)
     rmse_list = []
-    for _ in range(n_episodes):
+    pbar = tqdm(
+        total=n_episodes*n_steps,
+        desc=f"TD-Table: alpha={alpha}",
+        dynamic_ncols=True
+    )
+    for episode in range(n_episodes):
         for _ in range(n_steps):
             # Sample a state index uniformly
             state_idx = np.random.randint(0, env.num_states)
@@ -44,11 +50,14 @@ def TD_table(
             # TD update
             td_error = reward + gamma * weights[next_state_idx] - weights[state_idx]
             weights[state_idx] += alpha * td_error
+            pbar.update(1)
 
 
         # Calculate RMSE between estimated values and true values at the end of each episode
         rmse = np.sqrt(np.mean((weights - true_state_values)**2))
         rmse_list.append(rmse)
+        pbar.set_postfix({"RMSE": rmse, "Episode": episode})
+    pbar.close()
 
     return weights, rmse_list
 
@@ -56,18 +65,34 @@ def TD_linear(
         env:GridWorld, 
         policy_matrix:np.ndarray, 
         true_state_values:np.ndarray,
+        basis:str = "poly", p=1,
         gamma=0.9, alpha=0.005, 
         n_episodes=500, n_steps=500
     ):
     P = env.get_model()
 
-    def phi_func(state):
-        x, y = state
-        return np.array([[x, y, 1]]).T # (3, 1)
-
-    weights = np.random.randn(3, 1)
+    if basis == "poly":
+        from feature import pos2poly
+        phi_func = lambda state: pos2poly(state, p)
+        weights = np.random.randn((p+1)*(p+2)//2, 1)
+    elif basis == "fourier":
+        from feature import pos2fourier
+        phi_func = lambda state: pos2fourier(state, p)
+        weights = np.random.randn((p+1)*(p+2)//2, 1)
+    elif basis == "fourierq":
+        from feature import pos2fourierq
+        phi_func = lambda state: pos2fourierq(state, p)
+        weights = np.random.randn((p+1)**2, 1)
+    else:
+        raise NotImplementedError
+    
     rmse_list = []
-    for _ in range(n_episodes):
+    pbar = tqdm(
+        total=n_episodes*n_steps,
+        desc=f"TD-Linear({basis}-{p}): alpha={alpha}",
+        dynamic_ncols=True
+    )
+    for episode in range(n_episodes):
         for _ in range(n_steps):
             # Sample a state index uniformly
             state_idx = np.random.randint(0, env.num_states)
@@ -81,15 +106,19 @@ def TD_linear(
             next_state = env.state_space[next_state_idx]
 
             # TD update
-            td_error = reward + gamma * phi_func(next_state).T @ weights - phi_func(next_state).T @ weights
-            weights += alpha * td_error * phi_func(state)
+            td_error = reward + gamma * phi_func(next_state) @ weights - phi_func(next_state) @ weights
+            weights += alpha * td_error * phi_func(state).T
+
+            pbar.update(1)
+        
 
         state_np = np.array(env.state_space)
-        state_stack = np.stack([state_np[:,0], state_np[:,1], np.ones((env.num_states))], axis=-1)
         # Calculate RMSE between estimated values and true values at the end of each episode
-        rmse = np.sqrt(np.mean(((state_stack @ weights).squeeze() - true_state_values)**2))
+        rmse = np.sqrt(np.mean(((phi_func(state_np) @ weights).squeeze() - true_state_values)**2))
         rmse_list.append(rmse)
+        pbar.set_postfix({"RMSE": rmse, "Episode": episode})
+    pbar.close() 
 
-    return weights, rmse_list
+    return phi_func, weights, rmse_list
 
     

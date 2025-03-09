@@ -9,9 +9,11 @@ def pos2poly(state, p=2):
     return: return: poly_basis: [N, (p+1)(p+2)/2]
     - [1, x, y, x^2, xy, y^2, ...]
     """
-    state = np.array(state)
+    if not isinstance(state, np.ndarray):
+        state = np.array(state)
     if state.ndim == 1:
         state = state.reshape(1, -1)
+    assert state.shape[-1] == 2
     
     n_samples = state.shape[0]
     x = state[:, 0]
@@ -35,9 +37,11 @@ def pos2fourier(state, p=2):
     return: fourier_basis: [N, (p+1)(p+2)/2]
     - [1, cos(\pi x), cos(\pi y), cos(2\pi x), cos(\pi (x+y)), cos(2\pi y), ...]
     """
-    state = np.array(state)
+    if not isinstance(state, np.ndarray):
+        state = np.array(state)
     if state.ndim == 1:
         state = state.reshape(1, -1)
+    assert state.shape[-1] == 2
     
     n_samples = state.shape[0]
     x = state[:, 0]
@@ -61,9 +65,11 @@ def pos2fourierq(state, q=2):
     return: fourier_basis: [N, (q+1)^2]
     - [1, cos(\pi x), cos(\pi y), cos(2\pi x), cos(\pi (x+y)), cos(2\pi y), ...]
     """
-    state = np.array(state)
+    if not isinstance(state, np.ndarray):
+        state = np.array(state)
     if state.ndim == 1:
         state = state.reshape(1, -1)
+    assert state.shape[-1] == 2
     
     x = state[:, 0]
     y = state[:, 1]

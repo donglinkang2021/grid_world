@@ -47,6 +47,7 @@ def draw_matrix2d(matrix2d:np.ndarray, title:str):
     # Add color bar
     # fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
     plt.tight_layout()
+    plt.savefig(f"images/{title.replace(' ','_')}.png")
 
 def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
 
@@ -105,8 +106,9 @@ def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
     # Add color bar
     # fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
     plt.tight_layout()
+    plt.savefig(f"images/{title.replace(' ','_')}.png")
 
-def draw_prediction(weights:np.ndarray, m:int, n:int, title:str):
+def draw_prediction(phi_func:Callable, weights:np.ndarray, m:int, n:int, title:str):
     # Generate original row and column coordinates (x for rows, y for columns)
     x_orig = np.arange(m)
     y_orig = np.arange(n)
@@ -119,8 +121,8 @@ def draw_prediction(weights:np.ndarray, m:int, n:int, title:str):
     # Generate grid point coordinates
     X_new, Y_new = np.meshgrid(x_new, y_new)
 
-    phi = np.stack([X_new, Y_new, np.ones((100,100))], axis=-1)
-    Z_new = (phi @ weights).squeeze()
+    pos2d = np.stack([X_new.flatten(), Y_new.flatten()], axis=-1)
+    Z_new = (phi_func(pos2d) @ weights).squeeze().reshape(100,100)
 
     # Draw 3D surface plot
     fig = plt.figure(title, figsize=(10, 7))
@@ -133,14 +135,14 @@ def draw_prediction(weights:np.ndarray, m:int, n:int, title:str):
     )
 
     for x_row in x_orig:
-        phi = np.stack([[x_row] * 100, y_new, np.ones(100)], axis=-1)
-        z_points = (phi @ weights).squeeze()
+        pos2d = np.stack([[x_row] * 100, y_new], axis=-1)
+        z_points = (phi_func(pos2d) @ weights).squeeze()
         ax.plot(y_new, [x_row] * 100, z_points,
                 color='black', linestyle='-', linewidth=1)
 
     for y_col in y_orig:
-        phi = np.stack([x_new, [y_col]*100, np.ones(100)], axis=-1)
-        z_points = (phi @ weights).squeeze()
+        pos2d = np.stack([x_new, [y_col]*100], axis=-1)
+        z_points = (phi_func(pos2d) @ weights).squeeze()
         ax.plot([y_col]*100, x_new, z_points,
                 color='black', linestyle='-', linewidth=1)
 
@@ -157,6 +159,7 @@ def draw_prediction(weights:np.ndarray, m:int, n:int, title:str):
     # Add color bar
     # fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
     plt.tight_layout()
+    plt.savefig(f"images/{title.replace(' ','_')}.png")
 
 
 def draw_curve(
@@ -177,6 +180,7 @@ def draw_curve(
     
     plt.grid(alpha=0.3)
     plt.tight_layout()
+    plt.savefig(f"images/{title.replace(' ','_')}.png")
 
 def _test_draw_matrix():
     # Create a 5x5 matrix (example)

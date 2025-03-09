@@ -47,12 +47,36 @@ def TD_demo(env:GridWorld):
     policy_matrix /= policy_matrix.sum(axis=1)[:, np.newaxis]
     state_values0 = np.random.uniform(0,10,(env.num_states,))
     true_state_values = policy_evaluation(env, policy_matrix, state_values0)
-    estimated_state_values1, rmse_list1 = TD_table(env, policy_matrix, true_state_values, alpha=0.005)
-    weights, rmse_list2 = TD_linear(env, policy_matrix, true_state_values, alpha=0.0005)
-    draw_curve([rmse_list1, rmse_list2],[r"TD-table: $\alpha$=0.005", r"TD-linear: $\alpha$=0.0005"])
-    draw_matrix2d_smooth(estimated_state_values1.reshape(env.env_size), title="Estimated State Values(TD-Table)")
-    draw_prediction(weights, m=env.env_size[0], n=env.env_size[1], title="Estimated State Values(TD-Linear)")
-    plt.show()
+    curve_dict = {
+        "data1d_list": [],
+        "label_list": []
+    }
+
+    alpha_list = [0.001, 0.005, 0.01]
+    for alpha in alpha_list:
+        estimated_state_values, rmse_list = TD_table(env, policy_matrix, true_state_values, alpha=alpha)
+        label = rf"TD-table: $\alpha$={alpha}"
+        draw_matrix2d_smooth(estimated_state_values.reshape(env.env_size), title=f"Estimated State Values(TD-table_alpha={alpha})")
+        curve_dict["data1d_list"].append(rmse_list)
+        curve_dict["label_list"].append(label)
+
+    basis_list = ["poly", "fourier", "fourierq"]
+    p_list = [1,2,3,4]
+    alpha = 0.0005
+    for basis in basis_list:
+        for p in p_list:
+            phi_func, weights, rmse_list = TD_linear(env, policy_matrix, true_state_values, basis=basis, p=p, alpha=alpha)
+            label = rf"TD-Linear({basis}-{p}): $\alpha$={alpha}"
+            draw_prediction(phi_func, weights, m=env.env_size[0], n=env.env_size[1], title=f"Estimated State Values(TD-Linear({basis}-{p})_alpha={alpha})")
+            curve_dict["data1d_list"].append(rmse_list)
+            curve_dict["label_list"].append(label)
+
+    draw_curve(**curve_dict, title="Comparisom of Different Basis Functions RMSE vs Episodes")
+    # plt.show()
+
+    import json
+    with open("result_curve.json", "w") as f:
+        json.dump(curve_dict, f)
 
 
 # Example usage:
@@ -61,5 +85,5 @@ if __name__ == "__main__":
     env = GridWorld(**vars(args))
     # random_policy_demo(env, num_steps=100)
     # show_policy_and_values_demo(env)
-    PE_demo(env)
-    # TD_demo(env)
+    # PE_demo(env)
+    TD_demo(env)
