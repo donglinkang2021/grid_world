@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib.colors import Normalize
 
 def pos2poly(state, p=2):
     r"""
@@ -134,28 +135,58 @@ def _test_fit_curve():
     try:
         import matplotlib.pyplot as plt
         title = 'Comparison of Different Basis Functions for Function Approximation'
-        fig = plt.figure(title, figsize=(15, 5))
+        fig = plt.figure(title, figsize=(15, 10))
         fig.suptitle(title, fontsize=16)
         
-        # Original function
-        ax1 = fig.add_subplot(141, projection='3d')
-        ax1.plot_surface(grid_x, grid_y, z, cmap='viridis', alpha=0.7)
-        ax1.set_title('Original')
+        # Common colormap and normalization for consistent colors
+        cmap = 'viridis'
+        norm = Normalize(vmin=z.min(), vmax=z.max())
+
+        kwargs_3d = dict(cmap=cmap, alpha=0.9, norm=norm)
+        kwargs_2d = dict(cmap=cmap, origin='upper', norm=norm)
         
-        # Polynomial approximation
-        ax2 = fig.add_subplot(142, projection='3d')
-        ax2.plot_surface(grid_x, grid_y, poly_pred.reshape(n_samples, n_samples), cmap='viridis', alpha=0.7)
-        ax2.set_title(f'Polynomial (p=4)\nMSE: {poly_error:.6f}')
+        # Original function - 3D
+        ax1 = fig.add_subplot(241, projection='3d')
+        ax1.plot_surface(grid_x, grid_y, z, **kwargs_3d)
+        ax1.set_title('Original (3D)')
         
-        # Fourier approximation
-        ax3 = fig.add_subplot(143, projection='3d')
-        ax3.plot_surface(grid_x, grid_y, fourier_pred.reshape(n_samples, n_samples), cmap='viridis', alpha=0.7)
-        ax3.set_title(f'Fourier (p=4)\nMSE: {fourier_error:.6f}')
+        # Polynomial approximation - 3D
+        ax2 = fig.add_subplot(242, projection='3d')
+        ax2.plot_surface(grid_x, grid_y, poly_pred.reshape(n_samples, n_samples), **kwargs_3d)
+        ax2.set_title(f'Polynomial p=4 (3D)\nMSE: {poly_error:.6f}')
         
-        # Fourier Q approximation
-        ax4 = fig.add_subplot(144, projection='3d')
-        ax4.plot_surface(grid_x, grid_y, fourierq_pred.reshape(n_samples, n_samples), cmap='viridis', alpha=0.7)
-        ax4.set_title(f'Fourier Q (q=4)\nMSE: {fourierq_error:.6f}')
+        # Fourier approximation - 3D
+        ax3 = fig.add_subplot(243, projection='3d')
+        ax3.plot_surface(grid_x, grid_y, fourier_pred.reshape(n_samples, n_samples), **kwargs_3d)
+        ax3.set_title(f'Fourier p=4 (3D)\nMSE: {fourier_error:.6f}')
+        
+        # Fourier Q approximation - 3D
+        ax4 = fig.add_subplot(244, projection='3d')
+        ax4.plot_surface(grid_x, grid_y, fourierq_pred.reshape(n_samples, n_samples), **kwargs_3d)
+        ax4.set_title(f'Fourier Q q=4 (3D)\nMSE: {fourierq_error:.6f}')
+        
+        # Original function - 2D heatmap
+        ax5 = fig.add_subplot(245)
+        im5 = ax5.imshow(z.T, **kwargs_2d)
+        ax5.set_title('Original (2D)')
+        
+        # Polynomial approximation - 2D heatmap
+        ax6 = fig.add_subplot(246)
+        im6 = ax6.imshow(poly_pred.reshape(n_samples, n_samples).T, **kwargs_2d)
+        ax6.set_title(f'Polynomial p=4 (2D)')
+        
+        # Fourier approximation - 2D heatmap
+        ax7 = fig.add_subplot(247)
+        im7 = ax7.imshow(fourier_pred.reshape(n_samples, n_samples).T, **kwargs_2d)
+        ax7.set_title(f'Fourier p=4 (2D)')
+        
+        # Fourier Q approximation - 2D heatmap
+        ax8 = fig.add_subplot(248)
+        im8 = ax8.imshow(fourierq_pred.reshape(n_samples, n_samples).T, **kwargs_2d)
+        ax8.set_title(f'Fourier Q q=4 (2D)')
+        
+        # Add colorbar
+        # plt.colorbar(im5, ax=[ax5, ax6, ax7, ax8], shrink=0.8)
         
         plt.tight_layout()
         plt.show()
