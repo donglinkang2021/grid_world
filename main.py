@@ -16,16 +16,14 @@ def random_policy_demo(env:GridWorld, num_steps=1000):
     env.render(animation_interval=2)
 
 def show_policy_and_values_demo(env:GridWorld):
-    policy_matrix = np.random.rand(env.num_states, len(env.action_space))
+    # policy_matrix = np.random.rand(env.num_states, len(env.action_space))
+    policy_matrix = np.ones((env.num_states, len(env.action_space))) / len(env.action_space)
     policy_matrix /= policy_matrix.sum(axis=1)[:, np.newaxis]
     state_values=np.random.uniform(0,10,(env.num_states,))
     
     env.show_policy_and_values(
         policy_matrix=policy_matrix,
-        state_values=state_values
-    )
-    env.show_values_3d(
-        state_values=state_values
+        # state_values=state_values
     )
     plt.show()
 
@@ -79,12 +77,65 @@ def TD_demo(env:GridWorld):
     with open("result_curve.json", "w") as f:
         json.dump(curve_dict, f)
 
+def plot_curve_demo():
+    import json
+    with open("result_curve.json", "r") as f:
+        curve_dict = json.load(f)
+
+    import pandas as pd
+    # turn into dataframe
+
+    df = pd.DataFrame(curve_dict)
+    print(df.head())
+
+    model_list = ["TD-table"]
+    for basis in ["poly", "fourier", "fourierq"]:
+        for p in [1,2,3]:
+            model_list.append(f"TD-Linear({basis}-{p})")
+
+    query = df.label_list.str.contains("TD-table")
+    draw_curve(
+        data1d_list=df[query].data1d_list.tolist(),
+        label_list=df[query].label_list.tolist(),
+        title=f"Comparisom of Different Step-size RMSE vs Episodes(TD-table)",
+    )
+
+    query1 = df.label_list.str.contains("poly-1")
+    query2 = df.label_list.str.contains("poly-2")
+    query = query1 | query2
+    print(query)
+    query[22] = False
+    query[13] = False
+    draw_curve(
+        data1d_list=df[query].data1d_list.tolist(),
+        label_list=df[query].label_list.tolist(),
+        title=f"Comparisom of Different Step-size RMSE vs Episodes(poly)",
+    )
+
+    query = df.label_list.str.contains("fourier-")
+    draw_curve(
+        data1d_list=df[query].data1d_list.tolist(),
+        label_list=df[query].label_list.tolist(),
+        title=f"Comparisom of Different Step-size RMSE vs Episodes(fourier)",
+    )
+
+    query = df.label_list.str.contains("fourierq")
+    draw_curve(
+        data1d_list=df[query].data1d_list.tolist(),
+        label_list=df[query].label_list.tolist(),
+        title=f"Comparisom of Different Step-size RMSE vs Episodes(fourierq)",
+    )
+    # plt.show()
+
+    # plt.show()
+
 
 # Example usage:
 if __name__ == "__main__":
     from arguments import args        
     env = GridWorld(**vars(args))
     # random_policy_demo(env, num_steps=100)
-    # show_policy_and_values_demo(env)
+    show_policy_and_values_demo(env)
     # PE_demo(env)
-    TD_demo(env)
+    # TD_demo(env)
+    # plot_curve_demo()

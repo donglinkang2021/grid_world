@@ -1,6 +1,17 @@
 import numpy as np
 from matplotlib.colors import Normalize
 
+def state_norm(state):
+    if not isinstance(state, np.ndarray):
+        state = np.array(state)
+    if state.ndim == 1:
+        state = state.reshape(1, -1)
+    assert state.shape[-1] == 2
+    # norm state to [0, 1]
+    state = state - state.min(axis=0)
+    state = state / state.max(axis=0)
+    return state
+
 def pos2poly(state, p=2):
     r"""
     state: (x,y) or [(x1,y1), (x2,y2), ...]
@@ -9,11 +20,7 @@ def pos2poly(state, p=2):
     return: return: poly_basis: [N, (p+1)(p+2)/2]
     - [1, x, y, x^2, xy, y^2, ...]
     """
-    if not isinstance(state, np.ndarray):
-        state = np.array(state)
-    if state.ndim == 1:
-        state = state.reshape(1, -1)
-    assert state.shape[-1] == 2
+    state = state_norm(state)
     
     n_samples = state.shape[0]
     x = state[:, 0]
@@ -37,11 +44,7 @@ def pos2fourier(state, p=2):
     return: fourier_basis: [N, (p+1)(p+2)/2]
     - [1, cos(\pi x), cos(\pi y), cos(2\pi x), cos(\pi (x+y)), cos(2\pi y), ...]
     """
-    if not isinstance(state, np.ndarray):
-        state = np.array(state)
-    if state.ndim == 1:
-        state = state.reshape(1, -1)
-    assert state.shape[-1] == 2
+    state = state_norm(state)
     
     n_samples = state.shape[0]
     x = state[:, 0]
@@ -65,11 +68,7 @@ def pos2fourierq(state, q=2):
     return: fourier_basis: [N, (q+1)^2]
     - [1, cos(\pi x), cos(\pi y), cos(2\pi x), cos(\pi (x+y)), cos(2\pi y), ...]
     """
-    if not isinstance(state, np.ndarray):
-        state = np.array(state)
-    if state.ndim == 1:
-        state = state.reshape(1, -1)
-    assert state.shape[-1] == 2
+    state = state_norm(state)
     
     x = state[:, 0]
     y = state[:, 1]
