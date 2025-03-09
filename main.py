@@ -36,17 +36,20 @@ def PE_demo(env:GridWorld):
     state_values=np.random.uniform(0,10,(env.num_states,))
     state_values = policy_evaluation(env, policy_matrix, state_values)
     env.show_policy_and_values(state_values=state_values)
-    draw_matrix2d_smooth(state_values.reshape(env.env_size), title="3D State Values")
+    draw_matrix2d_smooth(state_values.reshape(env.env_size), title="True State Values")
+    draw_matrix2d_smooth(state_values.reshape(env.env_size), title="True State Values(k=3)", k=3)
     plt.show()
 
 def TD_demo(env:GridWorld):
-    from algorithms import TD_table, TD_linear
+    from algorithms import TD_table, TD_linear, policy_evaluation
     from utils import draw_curve, draw_prediction
     policy_matrix = np.ones((env.num_states, len(env.action_space))) / len(env.action_space)
     policy_matrix /= policy_matrix.sum(axis=1)[:, np.newaxis]
-    estimated_state_values1, rmse_list1 = TD_table(env, policy_matrix, alpha=0.005)
-    weights, rmse_list2 = TD_linear(env, policy_matrix, alpha=0.005)
-    draw_curve([rmse_list1, rmse_list2],[r"TD-table: $\alpha$=0.005", r"TD-linear: $\alpha$=0.005"])
+    state_values0 = np.random.uniform(0,10,(env.num_states,))
+    true_state_values = policy_evaluation(env, policy_matrix, state_values0)
+    estimated_state_values1, rmse_list1 = TD_table(env, policy_matrix, true_state_values, alpha=0.005)
+    weights, rmse_list2 = TD_linear(env, policy_matrix, true_state_values, alpha=0.0005)
+    draw_curve([rmse_list1, rmse_list2],[r"TD-table: $\alpha$=0.005", r"TD-linear: $\alpha$=0.0005"])
     draw_matrix2d_smooth(estimated_state_values1.reshape(env.env_size), title="Estimated State Values(TD-Table)")
     draw_prediction(weights, m=env.env_size[0], n=env.env_size[1], title="Estimated State Values(TD-Linear)")
     plt.show()
@@ -58,5 +61,5 @@ if __name__ == "__main__":
     env = GridWorld(**vars(args))
     # random_policy_demo(env, num_steps=100)
     # show_policy_and_values_demo(env)
-    # PE_demo(env)
-    TD_demo(env)
+    PE_demo(env)
+    # TD_demo(env)

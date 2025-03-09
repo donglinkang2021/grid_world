@@ -23,6 +23,7 @@ def policy_evaluation(env:GridWorld, policy_matrix:np.ndarray, state_values:np.n
 def TD_table(
         env:GridWorld, 
         policy_matrix:np.ndarray, 
+        true_state_values:np.ndarray,
         gamma=0.9, alpha=0.005, 
         n_episodes=500, n_steps=500
     ):
@@ -30,7 +31,6 @@ def TD_table(
     weights = np.random.randn(env.num_states, 1)
     rmse_list = []
     for _ in range(n_episodes):
-        step_rmse_list = []
         for _ in range(n_steps):
             # Sample a state index uniformly
             state_idx = np.random.randint(0, env.num_states)
@@ -45,10 +45,9 @@ def TD_table(
             td_error = reward + gamma * weights[next_state_idx] - weights[state_idx]
             weights[state_idx] += alpha * td_error
 
-            step_rmse_list.append(td_error)
 
         # Calculate RMSE between estimated values and true values at the end of each episode
-        rmse = np.sqrt(np.mean(np.array(step_rmse_list)**2))
+        rmse = np.sqrt(np.mean((weights - true_state_values)**2))
         rmse_list.append(rmse)
 
     return weights, rmse_list
@@ -56,6 +55,7 @@ def TD_table(
 def TD_linear(
         env:GridWorld, 
         policy_matrix:np.ndarray, 
+        true_state_values:np.ndarray,
         gamma=0.9, alpha=0.005, 
         n_episodes=500, n_steps=500
     ):
@@ -68,7 +68,6 @@ def TD_linear(
     weights = np.random.randn(3, 1)
     rmse_list = []
     for _ in range(n_episodes):
-        step_rmse_list = []
         for _ in range(n_steps):
             # Sample a state index uniformly
             state_idx = np.random.randint(0, env.num_states)
@@ -85,10 +84,10 @@ def TD_linear(
             td_error = reward + gamma * phi_func(next_state).T @ weights - phi_func(next_state).T @ weights
             weights += alpha * td_error * phi_func(state)
 
-            step_rmse_list.append(td_error)
-
+        state_np = np.array(env.state_space)
+        state_stack = np.stack([state_np[:,0], state_np[:,1], np.ones((env.num_states))], axis=-1)
         # Calculate RMSE between estimated values and true values at the end of each episode
-        rmse = np.sqrt(np.mean(np.array(step_rmse_list)**2))
+        rmse = np.sqrt(np.mean(((state_stack @ weights).squeeze() - true_state_values)**2))
         rmse_list.append(rmse)
 
     return weights, rmse_list

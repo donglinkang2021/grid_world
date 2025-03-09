@@ -97,8 +97,8 @@ def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
     ax.set_box_aspect([2.5, 2.5, 1])
 
     # Set axis labels
-    ax.set_xlabel('X (columns)', fontsize=12)
-    ax.set_ylabel('Y (rows)', fontsize=12)
+    ax.set_xlabel('X (rows)', fontsize=12)
+    ax.set_ylabel('Y (columns)', fontsize=12)
     ax.set_zlabel('Z (values)', fontsize=12)
     ax.set_title(title, fontsize=14)
 
@@ -107,7 +107,7 @@ def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
     plt.tight_layout()
 
 def draw_prediction(weights:np.ndarray, m:int, n:int, title:str):
-    # Generate original row and column coordinates (x for columns, y for rows)
+    # Generate original row and column coordinates (x for rows, y for columns)
     x_orig = np.arange(m)
     y_orig = np.arange(n)
 
@@ -149,8 +149,8 @@ def draw_prediction(weights:np.ndarray, m:int, n:int, title:str):
     ax.set_box_aspect([2.5, 2.5, 1])
 
     # Set axis labels
-    ax.set_xlabel('X (columns)', fontsize=12)
-    ax.set_ylabel('Y (rows)', fontsize=12)
+    ax.set_xlabel('X (rows)', fontsize=12)
+    ax.set_ylabel('Y (columns)', fontsize=12)
     ax.set_zlabel('Z (values)', fontsize=12)
     ax.set_title(title, fontsize=14)
 
