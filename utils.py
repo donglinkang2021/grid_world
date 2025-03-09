@@ -47,7 +47,7 @@ def draw_matrix2d(matrix2d:np.ndarray, title:str):
     # Add color bar
     # fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
     plt.tight_layout()
-    plt.savefig(f"images/{title.replace(' ','_')}.png")
+    plt.savefig(f"results/{title.replace(' ','_')}.png")
 
 def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
 
@@ -106,7 +106,7 @@ def draw_matrix2d_smooth(matrix2d:np.ndarray, title:str, k:int=1):
     # Add color bar
     # fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
     plt.tight_layout()
-    plt.savefig(f"images/{title.replace(' ','_')}.png")
+    plt.savefig(f"results/{title.replace(' ','_')}.png")
 
 def draw_prediction(phi_func:Callable, weights:np.ndarray, m:int, n:int, title:str):
     # Generate original row and column coordinates (x for rows, y for columns)
@@ -159,7 +159,7 @@ def draw_prediction(phi_func:Callable, weights:np.ndarray, m:int, n:int, title:s
     # Add color bar
     # fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
     plt.tight_layout()
-    plt.savefig(f"images/{title.replace(' ','_')}.png")
+    plt.savefig(f"results/{title.replace(' ','_')}.png")
 
 
 def draw_curve(
@@ -180,7 +180,7 @@ def draw_curve(
     
     plt.grid(alpha=0.3)
     plt.tight_layout()
-    plt.savefig(f"images/{title.replace(' ','_')}.png")
+    plt.savefig(f"results/{title.replace(' ','_')}.png")
 
 def _test_draw_matrix():
     # Create a 5x5 matrix (example)

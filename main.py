@@ -61,15 +61,16 @@ def TD_demo(env:GridWorld):
         curve_dict["label_list"].append(label)
 
     basis_list = ["poly", "fourier", "fourierq"]
-    p_list = [1,2,3,4]
-    alpha = 0.0005
-    for basis in basis_list:
-        for p in p_list:
-            phi_func, weights, rmse_list = TD_linear(env, policy_matrix, true_state_values, basis=basis, p=p, alpha=alpha)
-            label = rf"TD-Linear({basis}-{p}): $\alpha$={alpha}"
-            draw_prediction(phi_func, weights, m=env.env_size[0], n=env.env_size[1], title=f"Estimated State Values(TD-Linear({basis}-{p})_alpha={alpha})")
-            curve_dict["data1d_list"].append(rmse_list)
-            curve_dict["label_list"].append(label)
+    p_list = [1,2,3]
+    alpha_list = [0.0005, 0.001, 0.005]
+    for alpha in alpha_list:
+        for basis in basis_list:
+            for p in p_list:
+                phi_func, weights, rmse_list = TD_linear(env, policy_matrix, true_state_values, basis=basis, p=p, alpha=alpha)
+                label = rf"TD-Linear({basis}-{p}): $\alpha$={alpha}"
+                draw_prediction(phi_func, weights, m=env.env_size[0], n=env.env_size[1], title=f"Estimated State Values(TD-Linear_{basis}-{p}_alpha={alpha})")
+                curve_dict["data1d_list"].append(rmse_list)
+                curve_dict["label_list"].append(label)
 
     draw_curve(**curve_dict, title="Comparisom of Different Basis Functions RMSE vs Episodes")
     # plt.show()

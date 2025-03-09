@@ -106,7 +106,7 @@ def TD_linear(
             next_state = env.state_space[next_state_idx]
 
             # TD update
-            td_error = reward + gamma * phi_func(next_state) @ weights - phi_func(next_state) @ weights
+            td_error = reward + gamma * phi_func(next_state) @ weights - phi_func(state) @ weights
             weights += alpha * td_error * phi_func(state).T
 
             pbar.update(1)
