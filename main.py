@@ -54,7 +54,7 @@ def TD_demo(env:GridWorld):
     for alpha in alpha_list:
         estimated_state_values, rmse_list = TD_table(env, policy_matrix, true_state_values, alpha=alpha)
         label = rf"TD-table: $\alpha$={alpha}"
-        draw_matrix2d_smooth(estimated_state_values.reshape(env.env_size), title=f"Estimated State Values(TD-table_alpha={alpha})")
+        # draw_matrix2d_smooth(estimated_state_values.reshape(env.env_size), title=f"Estimated State Values(TD-table_alpha={alpha})")
         curve_dict["data1d_list"].append(rmse_list)
         curve_dict["label_list"].append(label)
 
@@ -66,12 +66,11 @@ def TD_demo(env:GridWorld):
             for p in p_list:
                 phi_func, weights, rmse_list = TD_linear(env, policy_matrix, true_state_values, basis=basis, p=p, alpha=alpha)
                 label = rf"TD-Linear({basis}-{p}): $\alpha$={alpha}"
-                draw_prediction(phi_func, weights, m=env.env_size[0], n=env.env_size[1], title=f"Estimated State Values(TD-Linear_{basis}-{p}_alpha={alpha})")
+                # draw_prediction(phi_func, weights, m=env.env_size[0], n=env.env_size[1], title=f"Estimated State Values(TD-Linear_{basis}-{p}_alpha={alpha})")
                 curve_dict["data1d_list"].append(rmse_list)
                 curve_dict["label_list"].append(label)
 
     draw_curve(**curve_dict, title="Comparisom of Different Basis Functions RMSE vs Episodes")
-    # plt.show()
 
     import json
     with open("result_curve.json", "w") as f:
@@ -88,10 +87,6 @@ def plot_curve_demo():
     df = pd.DataFrame(curve_dict)
     print(df.head())
 
-    model_list = ["TD-table"]
-    for basis in ["poly", "fourier", "fourierq"]:
-        for p in [1,2,3]:
-            model_list.append(f"TD-Linear({basis}-{p})")
 
     query = df.label_list.str.contains("TD-table")
     draw_curve(
@@ -100,12 +95,7 @@ def plot_curve_demo():
         title=f"Comparisom of Different Step-size RMSE vs Episodes(TD-table)",
     )
 
-    query1 = df.label_list.str.contains("poly-1")
-    query2 = df.label_list.str.contains("poly-2")
-    query = query1 | query2
-    print(query)
-    query[22] = False
-    query[13] = False
+    query = df.label_list.str.contains("poly")
     draw_curve(
         data1d_list=df[query].data1d_list.tolist(),
         label_list=df[query].label_list.tolist(),
@@ -125,9 +115,6 @@ def plot_curve_demo():
         label_list=df[query].label_list.tolist(),
         title=f"Comparisom of Different Step-size RMSE vs Episodes(fourierq)",
     )
-    # plt.show()
-
-    # plt.show()
 
 
 # Example usage:
@@ -135,7 +122,7 @@ if __name__ == "__main__":
     from arguments import args        
     env = GridWorld(**vars(args))
     # random_policy_demo(env, num_steps=100)
-    show_policy_and_values_demo(env)
+    # show_policy_and_values_demo(env)
     # PE_demo(env)
     # TD_demo(env)
-    # plot_curve_demo()
+    plot_curve_demo()

@@ -8,9 +8,8 @@ def state_norm(state):
         state = state.reshape(1, -1)
     assert state.shape[-1] == 2
     # norm state to [0, 1]
-    state = state - state.min(axis=0)
-    state = state / state.max(axis=0)
-    return state
+    # return state # run feature.py, please uncomment this line 
+    return state / 5 # run main.py
 
 def pos2poly(state, p=2):
     r"""
